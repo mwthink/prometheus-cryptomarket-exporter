@@ -64,11 +64,14 @@ app.get('/healthz',healthHandler);
 Promise.resolve()
 .then(async () => {
   // Initialize coin info
+  console.log('Initializing coin list');
+  const initTime = Date.now();
   allCoins = (await getAllCoinGeckoCoins())
     .reduce((acc, coin) => ({
       ...acc,
       [coin.id]: coin
     }), {})
+  console.log(`Finished loading coin list - Took ${Math.round((Date.now() - time1) / 1000)} seconds`)
   // Initialize stats
   await updateStats();
 })
