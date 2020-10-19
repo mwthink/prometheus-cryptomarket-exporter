@@ -13,6 +13,7 @@ spec:
       containers:
       - name: exporter
         image: prometheus-cryptomarket-exporter
+        imagePullPolicy: Always
         ports:
         - name: http
           containerPort: 3000

@@ -9,5 +9,5 @@ resources:
 
 images:
 - name: prometheus-cryptomarket-exporter
-  # newName: ""
+  newName: docker.io/mwthink/prometheus-cryptomarket-exporter
   newTag: latest
