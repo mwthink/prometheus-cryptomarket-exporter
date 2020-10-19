@@ -3,6 +3,8 @@ import * as Express from 'express';
 import config from './config';
 import { CoinGeckoCoinListing, getAllCoinGeckoCoins, getCoinGeckoPrice } from './utils';
 
+let appIsReady = false;
+
 let allCoins: {[currency_code:string]: CoinGeckoCoinListing} = {};
 const priceGauges = config.currencies.reduce((acc, c) => ({
   ...acc,
@@ -46,7 +48,17 @@ app.get('/metrics', (req, res, next) => {
     .send(Prom.register.metrics())
 });
 
+// Root redirect
 app.get('/', ({}, res) => res.redirect('/metrics'));
+
+// Liveness/Readiness
+const healthHandler: Express.Handler = (req, res, next) => {
+  if(!appIsReady){
+    return res.status(500).contentType('text/plain').send('not ready')
+  }
+  return res.status(200).contentType('text/plain').send('ok')
+};
+app.get('/healthz',healthHandler);
 
 // Main app logic
 Promise.resolve()
@@ -64,6 +76,7 @@ Promise.resolve()
   // Start server
   const server = app.listen(config.listen_port, () => {
     console.log('Listening on port', config.listen_port);
+    appIsReady = true;
     // Update the prices on a loop
     setInterval(async () => {
       await updateStats();
@@ -73,6 +86,7 @@ Promise.resolve()
   // Handle process termination
   const TERM_SIGS = ['SIGINT','SIGTERM'];
   TERM_SIGS.forEach(sig => {
+    appIsReady = false;
     process.on(sig, () => {
       console.log(`Received ${sig}`);
       server.close(() => {
