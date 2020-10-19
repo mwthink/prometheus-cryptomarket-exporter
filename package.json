@@ -6,7 +6,8 @@
   "author": "Marshall Williams <marshall@mwthink.net>",
   "license": "MIT",
   "scripts": {
-    "build": "npx tsc"
+    "build": "npx tsc",
+    "build:docker:multiarch": "docker buildx build --platform linux/amd64,linux/arm/v7 -t mwthink/prometheus-cryptomarket-exporter:multiarch --push ."
   },
   "dependencies": {
     "axios": "^0.20.0",

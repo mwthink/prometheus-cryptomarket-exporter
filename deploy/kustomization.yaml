@@ -10,4 +10,4 @@ resources:
 images:
 - name: prometheus-cryptomarket-exporter
   newName: docker.io/mwthink/prometheus-cryptomarket-exporter
-  newTag: latest
+  newTag: multiarch
