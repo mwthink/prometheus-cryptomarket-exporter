@@ -6,8 +6,8 @@ import { getCoinGeckoPrice } from './utils';
 const priceGauges = config.currencies.reduce((acc, c) => ({
   ...acc,
   [c]: new Prom.Gauge({
-    name: [c.split('-').join('_'),'price',config.vs_currency.toLowerCase()].join('_'),
-    help: `Price of 1 ${c} in ${config.vs_currency.toUpperCase()}`
+    name: [config.metric_prefix,c.split('-').join('_'),'price',config.vs_currency.toLowerCase()].join('_'),
+    help: `Price of 1 ${c} in ${config.vs_currency.toUpperCase()}`,
   })
 }
 ), {})

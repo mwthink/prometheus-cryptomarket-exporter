@@ -10,10 +10,12 @@ spec:
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
+      
       containers:
       - name: exporter
         image: prometheus-cryptomarket-exporter
         imagePullPolicy: Always
+        
         env:
         - name: CURRENCIES
           value: "bitcoin monero tezos ethereum dai uniswap wrapped-bitcoin orchid-protocol harvest-finance"
@@ -21,9 +23,16 @@ spec:
           value: "usd"
         - name: SCRAPE_INTERVAL
           value: "10"
+        
         ports:
         - name: http
           containerPort: 3000
           protocol: TCP
+        
         securityContext:
           runAsNonRoot: true
+        
+        resources:
+          requests:
+            cpu: 15m
+            memory: 32Mi
