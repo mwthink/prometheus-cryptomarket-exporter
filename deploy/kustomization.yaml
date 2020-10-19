@@ -1,0 +1,13 @@
+commonLabels:
+  app: prometheus-cryptomarket-exporter
+  app.kubernetes.io/name: prometheus-cryptomarket-exporter
+  app.kubernetes.io/part-of: prometheus-cryptomarket-exporter
+
+resources:
+- deployment.yaml
+- service.yaml
+
+images:
+- name: prometheus-cryptomarket-exporter
+  # newName: ""
+  newTag: latest

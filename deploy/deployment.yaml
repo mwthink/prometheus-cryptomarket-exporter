@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-cryptomarket-exporter
+spec:
+  replicas: 1
+  template:
+    spec:
+      enableServiceLinks: false
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+      - name: exporter
+        image: prometheus-cryptomarket-exporter
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        securityContext:
+          runAsNonRoot: true
