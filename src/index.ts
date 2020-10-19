@@ -38,4 +38,17 @@ Promise.resolve().then(async () => {
       await updateStats();
     }, config.interval_seconds * 1000)
   });
+
+  // Handle process termination
+  const TERM_SIGS = ['SIGINT','SIGTERM'];
+  TERM_SIGS.forEach(sig => {
+    process.on(sig, () => {
+      console.log(`Received ${sig}`);
+      server.close(() => {
+        console.log('Server stopped');
+        console.log('Clean up complete')
+        process.exit()
+      })
+    })
+  })
 })
