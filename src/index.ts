@@ -71,7 +71,7 @@ Promise.resolve()
       ...acc,
       [coin.id]: coin
     }), {})
-  console.log(`Finished loading coin list - Took ${Math.round((Date.now() - time1) / 1000)} seconds`)
+  console.log(`Finished loading coin list - Took ${Math.round((Date.now() - initTime) / 1000)} seconds`)
   // Initialize stats
   await updateStats();
 })
