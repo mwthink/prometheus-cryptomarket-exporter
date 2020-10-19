@@ -1,5 +1,5 @@
 import * as Prom from 'prom-client';
-import * as Http from 'http';
+import * as Express from 'express';
 import config from './config';
 import { getCoinGeckoPrice } from './utils';
 
@@ -21,23 +21,31 @@ const updateStats = async (): Promise<void> => {
   })
 }
 
-const server = Http.createServer((req, res) => {
-  res.write(Prom.register.metrics());
-  res.end();
-})
+const app = Express();
 
-Promise.resolve().then(async () => {
-  console.log('Initializing stats');
-  await updateStats()
+app.get('/metrics', (req, res, next) => {
+  return res.contentType('text/plain')
+    .set('Cache-control', 'public, max-age=5')
+    .send(Prom.register.metrics())
+});
+
+app.get('/', ({}, res) => res.redirect('/metrics'));
+
+// Main app logic
+Promise.resolve()
+.then(async () => {
+  // Initialize stats
+  await updateStats();
 })
 .then(() => {
-  console.log('Starting server')
-  server.listen(config.listen_port, () => {
-    console.log('Listening on', config.listen_port)
+  // Start server
+  const server = app.listen(config.listen_port, () => {
+    console.log('Listening on port', config.listen_port);
+    // Update the prices on a loop
     setInterval(async () => {
       await updateStats();
     }, config.interval_seconds * 1000)
-  });
+  })
 
   // Handle process termination
   const TERM_SIGS = ['SIGINT','SIGTERM'];
