@@ -2,15 +2,31 @@
 This will scrape CoinGecko for cryptocurrency prices and then provide them
 as Prometheus-style metrics.
 
-One instance can scrape multiple currency prices, but will only get values
-in a single currency (configurable with `VS_CURRENCY`). Prices will be
-scraped every _n_ seconds where _n_ is an integer specified
-by `SCRAPE_INTERVAL` (10 seconds by default).
-
-You can specify which currencies to scrape with the environment variable
-`CURRENCIES`. You should specify this as space-seperated IDs from CoinGecko.
-
 The instance will listen for requests on an HTTP server and serve up the metrics.
+
+## Deployment
+This is intended to be deployed to a Kubernetes cluster with the Prometheus Operator:
+```sh
+kubectl apply -k ./deploy/
+```
+
+You can also run it via Docker:
+```
+docker run -p 3000:3000 mwthink/prometheus-cryptomarket-exporter:latest
+```
+
+## Configuration
+Config options are specified via environment variables.
+- `CURRENCIES`
+  - Space-separated list of currencies to scrape (Default: `bitcoin monero ethereum`)
+- `VS_CURRENCY`
+  - The currency that prices should be tracked in (Default: `usd`)
+- `SCRAPE_INTERVAL`
+  - How often (in seconds) to scrape prices (Default: `10`)
+- `METRICS_PREFIX`
+  - String appended to front of prometheus metrics (Default: `cryptomarket`)
+- `LISTEN_PORT`
+  - Port for HTTP server to listen on (Default: `3000`)
 
 ## Docker Images
 This project is intended to be run as a Docker image. Images are pushed to the
