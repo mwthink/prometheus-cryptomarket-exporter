@@ -13,7 +13,7 @@ const currencyList = inputCurrencies.length > 0 ? inputCurrencies : defaultCurre
 export default {
   interval_seconds: Number(process.env['SCRAPE_INTERVAL'] || 10),
   listen_port: Number(process.env['LISTEN_PORT'] || 3000),
-  metric_prefix: 'coingecko',
+  metric_prefix: process.env['METRICS_PREFIX'] || 'cryptomarket',
   vs_currency: (process.env['VS_CURRENCY'] || 'usd').toLowerCase(),
   currencies: currencyList
 }

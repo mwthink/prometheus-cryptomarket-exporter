@@ -9,7 +9,7 @@ const priceGauges = config.currencies.reduce((acc, c) => ({
   [c]: new Prom.Gauge({
     name: [config.metric_prefix,'price',c.split('-').join('_'),config.vs_currency.toLowerCase()].join('_'),
     help: `Price of 1 ${c} in ${config.vs_currency.toUpperCase()}`,
-    labelNames: ['currency_id','currency_name','currency_symbol']
+    labelNames: ['currency_id','currency_name','currency_symbol','vs_currency']
   })
 }
 ), {})
@@ -23,6 +23,7 @@ const updateStats = async (): Promise<void> => {
           currency_id: allCoins[currency_code].id,
           currency_name: allCoins[currency_code].name,
           currency_symbol: allCoins[currency_code].symbol,
+          vs_currency: config.vs_currency.toUpperCase(),
         },
         prices[currency_code][config.vs_currency]
       )
