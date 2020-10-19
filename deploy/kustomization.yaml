@@ -6,6 +6,7 @@ commonLabels:
 resources:
 - deployment.yaml
 - service.yaml
+- servicemonitor.yaml
 
 images:
 - name: prometheus-cryptomarket-exporter
