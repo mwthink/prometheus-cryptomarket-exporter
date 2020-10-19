@@ -1,6 +1,6 @@
 import Axios from 'axios';
 
-const gecko = Axios.create({
+export const gecko = Axios.create({
   baseURL: 'https://api.coingecko.com/api/v3',
 })
 
@@ -9,6 +9,55 @@ export type CoinGeckoSimplePriceResult = {
     [price_currency:string]: number;
   }
 }
+
+export type CoinGeckoCoinListing = {
+  id: string;
+  symbol: string;
+  name: string;
+}
+
+export type CoinGeckoCoinInfo = CoinGeckoCoinListing & {
+  block_time_in_minutes?: number;
+  hashing_algorithm?: number;
+  asset_platform_id?: string;
+  categories?: string[];
+  links?: {
+    homepage?: string[];
+  }
+  image?: {
+    thumb?: string;
+    small?: string;
+    large?: string;
+  }
+  genesis_date?: string;
+  market_data?: {
+    current_price?: {
+      [currency:string]: number;
+    }
+  }
+  last_updated?: string;
+  tickers?: CoinGeckoTickerInfo[];
+}
+
+export type CoinGeckoTickerInfo = {
+  base: string;
+  target: string;
+  market: any;
+  last: number;
+  volume: number;
+  converted_last: any;
+  converted_volume: any;
+  coin_id: string;
+  // TODO more values
+}
+
+export const getAllCoinGeckoCoins = async (): Promise<CoinGeckoCoinListing[]> => (
+  gecko.get('/coins/list').then(r => r.data)
+)
+
+export const getCoinGeckoCoinInfo = async (coin_id:string): Promise<CoinGeckoCoinInfo> => (
+  gecko.get(`/coins/${coin_id}`).then(r => r.data)
+)
 
 /**
  * Returns a simple price chart for given currencies in the given vs_currencies

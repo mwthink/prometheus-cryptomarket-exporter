@@ -1,13 +1,15 @@
 import * as Prom from 'prom-client';
 import * as Express from 'express';
 import config from './config';
-import { getCoinGeckoPrice } from './utils';
+import { CoinGeckoCoinListing, getAllCoinGeckoCoins, getCoinGeckoPrice } from './utils';
 
+let allCoins: {[currency_code:string]: CoinGeckoCoinListing} = {};
 const priceGauges = config.currencies.reduce((acc, c) => ({
   ...acc,
   [c]: new Prom.Gauge({
     name: [config.metric_prefix,'price',c.split('-').join('_'),config.vs_currency.toLowerCase()].join('_'),
     help: `Price of 1 ${c} in ${config.vs_currency.toUpperCase()}`,
+    labelNames: ['currency_id','currency_name','currency_symbol']
   })
 }
 ), {})
@@ -16,13 +18,27 @@ const updateStats = async (): Promise<void> => {
   await getCoinGeckoPrice(config.currencies, [config.vs_currency])
   .then(prices => {
     Object.keys(prices).forEach(currency_code => {
-      priceGauges[currency_code].set(prices[currency_code][config.vs_currency])
+      priceGauges[currency_code].set(
+        {
+          currency_id: allCoins[currency_code].id,
+          currency_name: allCoins[currency_code].name,
+          currency_symbol: allCoins[currency_code].symbol,
+        },
+        prices[currency_code][config.vs_currency]
+      )
     })
   })
 }
 
 const app = Express();
 
+// GET list of supported coins
+app.get('/coins', async (req, res) => {
+  const coins = await getAllCoinGeckoCoins();
+  return res.send(coins);
+})
+
+// GET prometheus metrics
 app.get('/metrics', (req, res, next) => {
   return res.contentType('text/plain')
     .set('Cache-control', 'public, max-age=5')
@@ -34,6 +50,12 @@ app.get('/', ({}, res) => res.redirect('/metrics'));
 // Main app logic
 Promise.resolve()
 .then(async () => {
+  // Initialize coin info
+  allCoins = (await getAllCoinGeckoCoins())
+    .reduce((acc, coin) => ({
+      ...acc,
+      [coin.id]: coin
+    }), {})
   // Initialize stats
   await updateStats();
 })
